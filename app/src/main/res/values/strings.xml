@@ -5,4 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Item-List-Fragment -->
+    <string name="qr_code_button">QR Code Scan</string>
+
 </resources>
