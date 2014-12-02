@@ -31,11 +31,14 @@ public class ItemListFragment extends Fragment {
 
     @InjectView(R.id.qr_code_button) Button button;
     @InjectView(R.id.textView) TextView tv;
+    private BarcodeScanner scanner;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.item_list_fragment, container, false);
         ButterKnife.inject(this, view);
+
+        scanner = new BarcodeScanner();
 
         return view;
     }
@@ -43,35 +46,19 @@ public class ItemListFragment extends Fragment {
 
     @OnClick(R.id.qr_code_button)
     public void clicked() {
-        Toast.makeText(getActivity().getApplicationContext(), "heyy", Toast.LENGTH_SHORT).show();
-        IntentIntegrator scanIntegrator = new IntentIntegrator(this.getActivity());
-        scanIntegrator.initiateScan();
+        scanner.startBarcodeScan(ItemListFragment.this);
     }
 
-    public static void onReceiveBarcodeResults(){
-        Log.d("ItemListFragment", "onReceiveBarcodeResults running");
-
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         Toast.makeText(getActivity(), "onActivityResult Running", Toast.LENGTH_LONG);
 
         Log.d("ItemListFragment", "onActivityResult running");
-        //retrieve scan result
-        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanningResult != null) {
-            //we have a result
-            String scanContent = scanningResult.getContents();
-            String scanFormat  = scanningResult.getFormatName();
 
-            tv.setText(scanContent);
-            Toast.makeText(getActivity(),scanContent, Toast.LENGTH_LONG);
+        String result = scanner.parseScanResults(requestCode, resultCode, intent);
+        String name = scanner.getProductNameFromBarcode(result);
+        Toast.makeText(this.getActivity(), name, Toast.LENGTH_LONG).show();
 
-        }
-        else{
-            Toast.makeText(getActivity(),
-                    "No scan data received!", Toast.LENGTH_SHORT).show();
-        }
     }
 }

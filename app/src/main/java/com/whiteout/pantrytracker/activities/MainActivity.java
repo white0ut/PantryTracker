@@ -18,10 +18,12 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.whiteout.pantrytracker.R;
 import com.whiteout.pantrytracker.adapters.PantryPagerAdapter;
+import com.whiteout.pantrytracker.barcode.BarcodeScanner;
 import com.whiteout.pantrytracker.fragments.ItemListFragment;
 
 import butterknife.ButterKnife;
@@ -60,7 +62,6 @@ public class MainActivity extends FragmentActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("MainActivity", "onActivityResult running");
         super.onActivityResult(requestCode, resultCode, data);
-        ItemListFragment.onReceiveBarcodeResults();
     }
 
 
