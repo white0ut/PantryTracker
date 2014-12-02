@@ -34,4 +34,6 @@ public class PantryPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return 2;
     }
+
+
 }

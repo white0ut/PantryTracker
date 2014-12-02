@@ -1,5 +1,6 @@
 package com.whiteout.pantrytracker.activities;
 
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -14,12 +15,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.whiteout.pantrytracker.R;
 import com.whiteout.pantrytracker.adapters.PantryPagerAdapter;
+import com.whiteout.pantrytracker.fragments.ItemListFragment;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -39,6 +42,7 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("MainActivity", "onCreate running");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
@@ -50,8 +54,13 @@ public class MainActivity extends FragmentActivity {
         tabs.setViewPager(pager);
 
         changeColor(currentColor);
+    }
 
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("MainActivity", "onActivityResult running");
+        super.onActivityResult(requestCode, resultCode, data);
+        ItemListFragment.onReceiveBarcodeResults();
     }
 
 
