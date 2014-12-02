@@ -23,7 +23,7 @@ public class BarcodeScanner {
     /**
      * Launches an intent to cal the ZXing barcode scanner. Calls the passed fragment's
      * onActivityResult when complete.
-     * @param fragment
+     * @param fragment Fragment to return results to
      */
     public void startBarcodeScan(Fragment fragment){
         IntentIntegrator scanIntegrator = new IntentIntegrator(fragment);
@@ -34,7 +34,7 @@ public class BarcodeScanner {
     /**
      * Retrieves a barcode stored as a String from an Intent. Accepts parameters from
      * onActivityResult.
-     * @return String containing barcode
+     * @return String containing barcode if one has been scanned. If no barcode has been scanned, returns null.
      */
     public String parseScanResults(int requestCode, int resultCode, Intent intent){
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
@@ -49,7 +49,7 @@ public class BarcodeScanner {
             return scanContent;
         }
         else{
-            return "";
+            return null;
         }
     }
 
@@ -57,7 +57,7 @@ public class BarcodeScanner {
      * Retrieves product data from Outpan. To be outside of UI thread, creates
      * a separate thread.
      * @param code Barcode to retrieve data for
-     * @return String value with name of product
+     * @return String value with name of product.
      */
     public String getProductNameFromBarcode(String code){
         // hacky but it works

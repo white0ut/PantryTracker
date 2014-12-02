@@ -52,13 +52,13 @@ public class ItemListFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        Toast.makeText(getActivity(), "onActivityResult Running", Toast.LENGTH_LONG);
-
         Log.d("ItemListFragment", "onActivityResult running");
 
         String result = scanner.parseScanResults(requestCode, resultCode, intent);
-        String name = scanner.getProductNameFromBarcode(result);
-        Toast.makeText(this.getActivity(), name, Toast.LENGTH_LONG).show();
-
+        if(result != null){
+            String name = scanner.getProductNameFromBarcode(result);
+            tv.setText(name);
+            Toast.makeText(this.getActivity(), name, Toast.LENGTH_LONG).show();
+        }
     }
 }

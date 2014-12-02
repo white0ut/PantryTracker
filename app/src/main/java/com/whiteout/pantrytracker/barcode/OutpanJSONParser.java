@@ -45,7 +45,12 @@ public class OutpanJSONParser {
 	 * @throws org.json.JSONException
 	 */
 	public String getProductNameFromString(String jsonString) throws JSONException{
-		JSONObject json = new JSONObject(jsonString);
-		return json.getString("name");		
+		if(isValidData(jsonString)){
+            JSONObject json = new JSONObject(jsonString);
+            return json.getString("name");
+        }
+        else{
+            return null;
+        }
 	}
 }
