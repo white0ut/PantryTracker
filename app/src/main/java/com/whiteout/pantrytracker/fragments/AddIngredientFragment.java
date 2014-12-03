@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ public class AddIngredientFragment extends Fragment{
 
     @InjectView(R.id.btn_add_submit) Button mSubmitButton;
     @InjectView(R.id.dp_add_expiration) DatePicker mDPExpiration;
+    @InjectView(R.id.np_add_quantity) NumberPicker mNPQuantity;
     @InjectView(R.id.et_add_name) EditText mETName;
     @InjectView(R.id.et_add_unit) EditText mETUnit;
     private BarcodeScanner scanner;
@@ -44,9 +46,10 @@ public class AddIngredientFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_add_ingredient, container,false);
         ButterKnife.inject(this, view);
 
+        Intent intent = getActivity().getIntent();
+
+
         scanner = new BarcodeScanner();
-
-
 
         return view;
     }
@@ -68,8 +71,15 @@ public class AddIngredientFragment extends Fragment{
 
     @OnClick(R.id.btn_add_submit)
     public void clicked() {
-        // SUBMIT STUFF GOES HERE
+
+
+
+
         Toast.makeText(getActivity(), "SUBMIT BUTTON CLICKED", Toast.LENGTH_LONG).show();
+    }
+
+    private void inputDataIsValid(){
+
     }
 
     @Override
