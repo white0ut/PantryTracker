@@ -31,7 +31,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
     private List<Item> mItemsArray;
     private LayoutInflater inflater;
 
-    public ItemListAdapter(Context context, int rId, ArrayList<Item> items) {
+    public ItemListAdapter(Context context, int rId, List<Item> items) {
         super(context, rId);
         mContext = context;
         mItemsArray = items;
@@ -109,6 +109,11 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
     @Override
     public void remove(Item object) {
         mItemsArray.remove(object);
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<Item> items) {
+        mItemsArray = items;
         notifyDataSetChanged();
     }
 
