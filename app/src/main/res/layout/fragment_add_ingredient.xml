@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            style="@style/CodeFont"
+            android:text="@string/tv_add_name"/>
+        <EditText
+            android:id="@+id/et_add_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/et_hint_ingredient_name"/>
+
+        <TextView
+            style="@style/CodeFont"
+            android:text="@string/tv_add_expire"/>
+
+        <DatePicker
+            android:id="@+id/dp_add_expiration"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:calendarViewShown="false"/>
+
+        <TextView
+            style="@style/CodeFont"
+            android:text="Quantity"/>
+
+        <EditText
+            android:id="@+id/et_add_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"/>
+
+        <TextView
+            style="@style/CodeFont"
+            android:text="Unit"/>
+
+        <EditText
+            android:id="@+id/et_add_unit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="tsp, oz, etc."
+            android:inputType="text"/>
+
+        <Button
+            android:id="@+id/btn_add_submit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit"/>
+    </LinearLayout>
+</ScrollView>

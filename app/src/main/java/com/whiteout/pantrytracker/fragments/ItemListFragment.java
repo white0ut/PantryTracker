@@ -1,5 +1,7 @@
 package com.whiteout.pantrytracker.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +30,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.whiteout.pantrytracker.activities.AddIngredientActivity;
+
 
 /**
  * Author:  Kendrick Cline
@@ -35,6 +39,7 @@ import java.util.List;
  * Email:   kdecline@gmail.com
  */
 public class ItemListFragment extends Fragment implements ItemListAdapter.ItemListAdapterCallbacks {
+
 
     ListView mListView;
     ItemListAdapter mAdapter;
@@ -64,6 +69,8 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
         }
 
         mListView = (ListView) view.findViewById(R.id.listView);
+
+
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             registerForContextMenu(mListView);
@@ -127,6 +134,21 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
                     return true;
                 case R.id.action_edit:
                     // TODO JOSH
+                    for (int i = adapter.getCount() - 1; i >= 0; i--) {
+                        if (mListView.isItemChecked(i)) {
+                            // Edit item
+                            Item editItem = (Item) mListView.getItemAtPosition(i);
+                            Intent intent = itemToIntent(editItem);
+                            intent.putExtra(AddIngredientFragment.KEY_INDEX, i);
+                            intent.putExtra(AddIngredientFragment.KEY_ID, editItem.getId());
+                            Log.d("IDProblem", "ItemListFrag: " + editItem.getId());
+
+                            intent.putExtra(AddIngredientFragment.KEY_REQUESTCODE, AddIngredientFragment.REQUEST_CODE_EXISTING);
+                            intent.setClass(getActivity(), AddIngredientActivity.class);
+                            startActivityForResult(intent, AddIngredientFragment.REQUEST_CODE_EXISTING);
+                            break;
+                        }
+                    }
                     mode.finish();
                     return true;
                 case R.id.action_refresh:
@@ -148,11 +170,25 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
             }
         }
 
+        /**
+         * Put all elements of Item as extras in an Intent
+         */
+        private Intent itemToIntent(Item item){
+            Intent intent = new Intent();
+            intent.putExtra(AddIngredientFragment.KEY_NAME, item.getName());
+            intent.putExtra(AddIngredientFragment.KEY_QUANTITY, item.getQuantity());
+            intent.putExtra(AddIngredientFragment.KEY_DATE, item.getExpiration());
+            intent.putExtra(AddIngredientFragment.KEY_UNIT, item.getUnit());
+            intent.putExtra(AddIngredientFragment.KEY_ID, item.getId());
+            return intent;
+        }
+
         @Override
         public void onDestroyActionMode(ActionMode mode) {
 
         }
     };
+
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -171,7 +207,9 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
                 }
                 return true;
             case R.id.action_new:
-                // TODO JOSH
+                Intent intent = new Intent(this.getActivity(), AddIngredientActivity.class);
+                intent.putExtra(AddIngredientFragment.KEY_REQUESTCODE, AddIngredientFragment.REQUEST_CODE_NEW);
+                startActivityForResult(intent, AddIngredientFragment.REQUEST_CODE_NEW);
                 return true;
             case R.id.action_refresh:
                 // Asynchronously re-load Items and return
@@ -187,6 +225,49 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == Activity.RESULT_OK){
+            Item item = new Item();
+            item.setName(data.getStringExtra(AddIngredientFragment.KEY_NAME));
+            item.setExpiration(data.getLongExtra(AddIngredientFragment.KEY_DATE, 0));
+            item.setQuantity(data.getFloatExtra(AddIngredientFragment.KEY_QUANTITY, 0));
+            item.setUnit(data.getStringExtra(AddIngredientFragment.KEY_UNIT));
+
+
+            if(requestCode == AddIngredientFragment.REQUEST_CODE_EXISTING){
+                Log.d("ItemListFragment","edit running");
+
+                //TODO update record in database
+                try {
+                    item.setId(data.getLongExtra(AddIngredientFragment.KEY_ID,5));
+                    item.setId(data.getLongExtra(AddIngredientFragment.KEY_ID,1));
+                    mAdapter.edit(data.getIntExtra(AddIngredientFragment.KEY_INDEX, 0), item);
+                    dataSource.open();
+                    dataSource.editItem(item);
+                    dataSource.close();
+                    mAdapter.notifyDataSetChanged();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+                try {
+                    mAdapter.add(item);
+                    mAdapter.notifyDataSetChanged();
+                    dataSource.open();
+                    dataSource.addItem(item);
+                    dataSource.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            Toast.makeText(getActivity(), item.getName(), Toast.LENGTH_SHORT).show();
         }
     }
 
