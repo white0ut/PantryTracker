@@ -24,6 +24,10 @@ import com.whiteout.pantrytracker.data.model.Item;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.whiteout.pantrytracker.activities.AddIngredientActivity;
+import com.whiteout.pantrytracker.barcode.*;
+
+
 
 /**
  * Author:  Kendrick Cline
@@ -86,6 +90,7 @@ public class ItemListFragment extends Fragment {
         return view;
     }
 
+
     AbsListView.MultiChoiceModeListener actionModeListener = new AbsListView.MultiChoiceModeListener() {
         @Override
         public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) { }
@@ -143,6 +148,7 @@ public class ItemListFragment extends Fragment {
 
         }
     };
+
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
