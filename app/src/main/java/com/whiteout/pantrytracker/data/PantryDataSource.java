@@ -73,6 +73,27 @@ public class PantryDataSource {
         database.delete(PantrySQLiteHelper.TABLE_ITEM, null, null);
     }
 
+    public void editItem(Item item) {
+        ContentValues values = new ContentValues();
+        values.put(PantrySQLiteHelper.KEY_ITEM_NAME, item.getName());
+        values.put(PantrySQLiteHelper.KEY_EXPIRATION, item.getExpiration());
+        values.put(PantrySQLiteHelper.KEY_QUANTITY, item.getQuantity());
+        values.put(PantrySQLiteHelper.KEY_UNIT, item.getUnit());
+
+        int newId = database.update(PantrySQLiteHelper.TABLE_ITEM, values, PantrySQLiteHelper.KEY_ID + " = " + item.getId(), null);
+
+
+//        Cursor cursor = database.query(PantrySQLiteHelper.TABLE_ITEM,
+//                allItemColumns, PantrySQLiteHelper.KEY_ID + " = " + newId, null,
+//        null, null, null);
+//        cursor.moveToFirst();
+//
+//        Item newItem = cursorToItem(cursor);
+//        cursor.close();
+//
+//        return newItem;
+    }
+
     public Item addItem(Item item) {
         ContentValues values = new ContentValues();
         values.put(PantrySQLiteHelper.KEY_ITEM_NAME, item.getName());

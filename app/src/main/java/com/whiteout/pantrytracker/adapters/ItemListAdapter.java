@@ -1,6 +1,7 @@
 package com.whiteout.pantrytracker.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
     private List<Item> mItemsArray;
     private LayoutInflater inflater;
 
+    private ItemListAdapterCallbacks mCallbacks;
+
     public ItemListAdapter(Context context, int rId, List<Item> items) {
         super(context, rId);
         mContext = context;
@@ -49,7 +52,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             convertView.setTag(holder);
         }
 
-        Item currItem = getItem(position);
+        final Item currItem = getItem(position);
 
         holder.name.setText(currItem.getName());
         holder.quantity.setText(currItem.getQuantity().toString());
@@ -60,25 +63,56 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             Timestamp ts = new Timestamp(currItem.getExpiration());
             holder.expiration.setText(ts.toString());
         }
-        holder.increment.setOnClickListener(incrementClickListener);
-        holder.decrement.setOnClickListener(decrementClickListener);
+        holder.increment.setTag(position);
+        holder.decrement.setTag(position);
+        holder.increment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = (Integer)v.getTag();
+                Item current = getItem(position);
+                Float next = current.getQuantity() + 1;
+                current.setQuantity(next);
+
+                notifyDataSetChanged();
+                if (mCallbacks != null)
+                    mCallbacks.onItemQuantityChanged(current);
+            }
+        });
+
+        holder.decrement.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = (Integer)v.getTag();
+                Item current = getItem(position);
+                Float oldQuantity = current.getQuantity();
+                if (oldQuantity >= 1) {
+                    Float next = current.getQuantity() - 1;
+                    current.setQuantity(next);
+                } else if (oldQuantity > 0) {
+                    current.setQuantity(0f);
+                }
+                if (oldQuantity > 0) {
+                    notifyDataSetChanged();
+                    if (mCallbacks != null)
+                        mCallbacks.onItemQuantityChanged(current);
+                }
+            }
+        });
 
         return convertView;
     }
 
-    private View.OnClickListener incrementClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            // TODO: increment quantity
+    public void attachCallbacks(Object o) {
+        try {
+            mCallbacks = (ItemListAdapterCallbacks) o;
+        } catch (ClassCastException  e) {
+            Log.e("ItemListAdapter", o.toString() + " must implement ItemListAdapter.ItemListAdapterCallbacks");
         }
-    };
+    }
 
-    private View.OnClickListener decrementClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            // TODO: decrement quantity
-        }
-    };
+    public void detachCallbacks() {
+        mCallbacks = null;
+    }
 
     @Override
     public int getCount() {
@@ -128,5 +162,9 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         public ViewHolder(View view) {
             ButterKnife.inject(this, view);
         }
+    }
+
+    public static interface ItemListAdapterCallbacks {
+        void onItemQuantityChanged(Item item);
     }
 }

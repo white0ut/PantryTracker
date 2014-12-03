@@ -1,6 +1,5 @@
 package com.whiteout.pantrytracker.fragments;
 
-import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,7 +33,7 @@ import java.util.List;
  * Date:    10/29/14
  * Email:   kdecline@gmail.com
  */
-public class ItemListFragment extends Fragment {
+public class ItemListFragment extends Fragment implements ItemListAdapter.ItemListAdapterCallbacks {
 
     ListView mListView;
     ItemListAdapter mAdapter;
@@ -76,8 +75,15 @@ public class ItemListFragment extends Fragment {
         new FetchItemsTask().execute();
         mListView.setAdapter(mAdapter);
 
+        mAdapter.attachCallbacks(this);
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        mAdapter.detachCallbacks();
+        super.onDestroyView();
     }
 
     AbsListView.MultiChoiceModeListener actionModeListener = new AbsListView.MultiChoiceModeListener() {
@@ -164,6 +170,7 @@ public class ItemListFragment extends Fragment {
                 }
                 return true;
             case R.id.action_new:
+                // TODO JOSH
                 return true;
             case R.id.action_refresh:
                 // Asynchronously re-load Items and return
@@ -186,6 +193,30 @@ public class ItemListFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.item_list_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onItemQuantityChanged(Item item) {
+        // Asynchronously update the DB
+        new UpdateItemTask().execute(item);
+    }
+
+    private class UpdateItemTask extends AsyncTask<Item, Void, Item> {
+
+        @Override
+        protected Item doInBackground(Item... params) {
+            try {
+                dataSource.open();
+                for (Item param : params) {
+                    dataSource.editItem(param);
+                }
+            } catch (SQLException e) {
+                Toast.makeText(getActivity(), "Error editing values", Toast.LENGTH_SHORT).show();
+            } finally {
+                dataSource.close();
+            }
+            return null;
+        }
     }
 
     private class FetchItemsTask extends AsyncTask<Void, Void, List<Item>> {
