@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.whiteout.pantrytracker.R;
 import com.whiteout.pantrytracker.adapters.PantryPagerAdapter;
+import com.whiteout.pantrytracker.barcode.BarcodeScanner;
+import com.whiteout.pantrytracker.fragments.ItemListFragment;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -27,6 +30,7 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("MainActivity", "onCreate running");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
