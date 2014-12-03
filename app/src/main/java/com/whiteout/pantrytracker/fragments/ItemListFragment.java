@@ -1,6 +1,7 @@
 package com.whiteout.pantrytracker.fragments;
 
-import android.database.sqlite.SQLiteException;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,8 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.whiteout.pantrytracker.activities.AddIngredientActivity;
-import com.whiteout.pantrytracker.barcode.*;
-
 
 
 /**
@@ -39,6 +38,7 @@ import com.whiteout.pantrytracker.barcode.*;
  * Email:   kdecline@gmail.com
  */
 public class ItemListFragment extends Fragment {
+
 
     ListView mListView;
     ItemListAdapter mAdapter;
@@ -125,6 +125,8 @@ public class ItemListFragment extends Fragment {
                     return true;
                 case R.id.action_edit:
                     // TODO JOSH
+
+
                     mode.finish();
                     return true;
                 case R.id.action_refresh:
@@ -170,6 +172,10 @@ public class ItemListFragment extends Fragment {
                 }
                 return true;
             case R.id.action_new:
+                // TODO JOSH
+                Intent intent = new Intent(this.getActivity(), AddIngredientActivity.class);
+                intent.putExtra(AddIngredientFragment.KEY_REQUESTCODE, AddIngredientFragment.REQUEST_CODE_NEW);
+                startActivityForResult(intent, AddIngredientFragment.REQUEST_CODE_NEW);
                 return true;
             case R.id.action_refresh:
                 // Asynchronously re-load Items and return
@@ -185,6 +191,33 @@ public class ItemListFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == Activity.RESULT_OK){
+            Item item = new Item();
+            item.setName(data.getStringExtra(AddIngredientFragment.KEY_NAME));
+            item.setExpiration(data.getLongExtra(AddIngredientFragment.KEY_DATE, 0));
+            item.setQuantity(data.getFloatExtra(AddIngredientFragment.KEY_QUANTITY, 0));
+            item.setUnit(data.getStringExtra(AddIngredientFragment.KEY_UNIT));
+            if(requestCode == AddIngredientFragment.REQUEST_CODE_EXISTING){
+                item.setId(data.getLongExtra(AddIngredientFragment.KEY_ID,0));
+                //TODO update record in database
+            }
+            else{
+                try {
+                    dataSource.open();
+                    dataSource.addItem(item);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            Toast.makeText(getActivity(), item.getName(), Toast.LENGTH_SHORT).show();
         }
     }
 
