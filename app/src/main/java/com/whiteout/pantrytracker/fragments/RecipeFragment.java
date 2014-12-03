@@ -1,88 +1,105 @@
 package com.whiteout.pantrytracker.fragments;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.TextView;
 
-import com.whiteout.pantrytracker.activities.MainActivity;
-import com.whiteout.pantrytracker.data.PantryDataSource;
-import com.whiteout.pantrytracker.data.model.Item;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.whiteout.pantrytracker.R;
 import com.whiteout.pantrytracker.data.model.Recipe;
-import com.whiteout.pantrytracker.data.model.RecipeSearch;
-import com.whiteout.pantrytracker.data.web.interfaces.YummlyRecipeSearchRetriever;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import com.whiteout.pantrytracker.data.web.interfaces.YummlyRecipeRetriever;
 
 /**
  * Author:  Kendrick Cline
  * Date:    12/3/14
  * Email:   kdecline@gmail.com
  */
-public class RecipeFragment extends ListFragment {
+public class RecipeFragment extends Fragment {
 
-    PantryDataSource dataSource;
-    List<RecipeSearch> searches;
+    ImageView mImageView;
+    TextView  titleName;
+    TextView  cookTime;
+    TextView  yield;
+    TextView  description;
+    ImageView logoView;
+
+    String title;
+    String cookTimeString;
+    String yieldString;
+    String descrptionString;
+    Float  rating;
+    String yummlyId;
+
+    DisplayImageOptions options;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        dataSource = ((MainActivity)getActivity()).getDataSource();
-        new FetchRecipes().execute();
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        options = new DisplayImageOptions.Builder()
+                .build();
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+
+        View view = inflater.inflate(R.layout.fragment_recipe, container, false);
+        mImageView = (ImageView) view.findViewById(R.id.largeImage);
+        titleName  = (TextView)  view.findViewById(R.id.name);
+        cookTime   = (TextView)  view.findViewById(R.id.cookTime);
+        yield      = (TextView)  view.findViewById(R.id.yield);
+        description= (TextView)  view.findViewById(R.id.description);
+        logoView   = (ImageView) view.findViewById(R.id.logoView);
+
+        Intent mIntent = getActivity().getIntent();
+        title = mIntent.getStringExtra(RecipeSearchFragment.EXTRA_RECIPE_NAME);
+        yummlyId = mIntent.getStringExtra(RecipeSearchFragment.EXTRA_ID);
+        rating = mIntent.getFloatExtra(RecipeSearchFragment.EXTRA_RATING, -1);
+
+        if (title != null) {
+            titleName.setText(title);
+        }
+
+        new RecipeFetcher().execute(yummlyId);
+
+        return view;
     }
 
-    private class FetchRecipes extends AsyncTask<Void, Void, List<RecipeSearch>> {
+    void loadRecipe(Recipe recipe) {
+        if (recipe.getCookTime() != null)
+            cookTime.setText(recipe.getCookTime());
+        if (recipe.getYield() != null)
+            yield.setText(recipe.getYield());
+        description.setText(recipe.getDirections());
+        ImageLoader.getInstance().displayImage(recipe.getFoodDownloadURL(), mImageView, options, null);
+        ImageLoader.getInstance().displayImage(recipe.getYummlyLogo(), logoView, options, null);
+    }
+
+    private class RecipeFetcher extends AsyncTask<String, Void, Recipe> {
         @Override
-        protected List<RecipeSearch> doInBackground(Void... params) {
-            List<Item> items = null;
-            List<RecipeSearch> recipes = null;
-            try {
-                dataSource.open();
-                Log.wtf("Kenny", "Opened datasource");
-                items = dataSource.getAllItems();
-                String[] itemNames = new String[items.size()];
-                for (int i=0; i<items.size(); i++) {
-                    itemNames[i] = items.get(i).getName();
-                }
-                Log.wtf("Kenny", "Querying Yummly API");
-                YummlyRecipeSearchRetriever ret = new YummlyRecipeSearchRetriever();
-                if (itemNames.length == 0) {
-                    recipes = ret.fetchRecipes(new String[] {"apple"});
-                } else {
-                    recipes = ret.fetchRecipes(itemNames);
-                }
-
-            } catch (SQLException e) {
-                Log.d("Kenny", "error loading items");
-            } finally {
-                dataSource.close();
-            }
-            return recipes;
+        protected Recipe doInBackground(String... params) {
+            Recipe recipe = null;
+            YummlyRecipeRetriever yrr = new YummlyRecipeRetriever();
+            Log.d("Kenny", "Fetching " + params[0]);
+            return yrr.fetchRecipes(params[0]);
         }
 
         @Override
-        protected void onPostExecute(List<RecipeSearch> recipeSearches) {
-            searches = recipeSearches;
-            List<String> vals = new ArrayList<String>();
-            for (RecipeSearch r : recipeSearches) {
-                vals.add(r.getRecipeName());
-            }
-            Log.d("Kenny", "Setting view");
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                    android.R.layout.simple_list_item_1, vals);
-            setListAdapter(adapter);
+        protected void onPostExecute(Recipe recipe) {
+            super.onPostExecute(recipe);
+            loadRecipe(recipe);
         }
     }
 }

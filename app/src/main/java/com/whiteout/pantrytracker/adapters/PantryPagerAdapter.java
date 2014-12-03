@@ -5,7 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.whiteout.pantrytracker.fragments.ItemListFragment;
-import com.whiteout.pantrytracker.fragments.RecipeFragment;
+import com.whiteout.pantrytracker.fragments.RecipeSearchFragment;
 
 /**
  * Author:  Kendrick Cline
@@ -40,7 +40,7 @@ public class PantryPagerAdapter extends FragmentPagerAdapter {
                 return new ItemListFragment();
             case 1:
             default:
-                return new RecipeFragment();
+                return new RecipeSearchFragment();
         }
     }
 

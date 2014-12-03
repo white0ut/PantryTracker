@@ -77,6 +77,10 @@ public class YummlyRecipeRetriever {
         Recipe recipe = new Recipe();
         JSONObject jsonObject = new JSONObject(jsonString);
 
+        JSONArray images = jsonObject.getJSONArray("images");
+        JSONObject imagesY = images.getJSONObject(0);
+        JSONObject attribution = jsonObject.getJSONObject("attribution");
+
         String lines = "";
         JSONArray ingredLines = jsonObject.getJSONArray("ingredientLines");
         for (int i=0; i < ingredLines.length(); i++) {
@@ -86,7 +90,9 @@ public class YummlyRecipeRetriever {
         recipe.setName(jsonObject.getString("name"));
         recipe.setYield(jsonObject.getString("yield"));
         recipe.setYummlyId(jsonObject.getString("id"));
-
+        recipe.setFoodDownload(imagesY.getString("hostedLargeUrl"));
+        recipe.setYummlyLogo(attribution.getString("logo"));
+        recipe.setCookTime(jsonObject.getString("totalTime"));
         return recipe;
     }
 }

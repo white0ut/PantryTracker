@@ -25,7 +25,6 @@ import butterknife.InjectView;
 
 public class MainActivity extends FragmentActivity {
 
-    private final Handler handler = new Handler();
 
     private PantryDataSource dataSource;
 
@@ -62,7 +61,7 @@ public class MainActivity extends FragmentActivity {
             YummlyRecipeSearchRetriever ret = new YummlyRecipeSearchRetriever();
             List<RecipeSearch> response = ret.fetchRecipes(new String[]{"vegetarian"});
             for (RecipeSearch s : response) {
-                Log.wtf("Kenny", s.getRecipeName());
+                Log.d("Kenny", s.getRecipeName());
             }
             return null;
         }

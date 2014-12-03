@@ -15,6 +15,10 @@ public class Recipe {
     private String name;
     private String directions;
     private String yield;
+    private String cookTime;
+
+    private String foodDownloadURL;
+    private String yummlyLogo;
 
 
     private List<Item> items;
@@ -44,6 +48,24 @@ public class Recipe {
         if (items == null)
             items = new ArrayList<Item>();
         items.add(i);
+    }
+    public void setCookTime(String cookTime) {
+        this.cookTime = cookTime;
+    }
+    public String getCookTime() {
+        return this.cookTime;
+    }
+    public void setFoodDownload(String s) {
+        this.foodDownloadURL = s;
+    }
+    public String getFoodDownloadURL() {
+        return this.foodDownloadURL;
+    }
+    public void setYummlyLogo(String yummlyLogo) {
+        this.yummlyLogo = yummlyLogo;
+    }
+    public String getYummlyLogo() {
+        return this.yummlyLogo;
     }
     public void setId(Long id) {
         this.id = id;
