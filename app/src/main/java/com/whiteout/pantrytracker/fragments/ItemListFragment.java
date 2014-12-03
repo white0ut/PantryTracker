@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.whiteout.pantrytracker.R;
 
+import com.whiteout.pantrytracker.activities.AddIngredientActivity;
 import com.whiteout.pantrytracker.barcode.*;
 
 import java.lang.reflect.Array;
@@ -43,12 +44,12 @@ public class ItemListFragment extends Fragment {
         return view;
     }
 
-
     @OnClick(R.id.qr_code_button)
     public void clicked() {
-        scanner.startBarcodeScan(ItemListFragment.this);
+        Intent intent = new Intent(this.getActivity(), AddIngredientActivity.class);
+        startActivity(intent);
+        //scanner.startBarcodeScan(ItemListFragment.this);
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {

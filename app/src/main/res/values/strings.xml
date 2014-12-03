@@ -8,4 +8,13 @@
     <!-- Item-List-Fragment -->
     <string name="qr_code_button">QR Code Scan</string>
 
+    <!-- Add-Ingredient-Fragment -->
+    <string name="et_hint_ingredient_name">Enter ingredient name</string>
+    <string name="datepick_hint_expiration_date">Enter expiration date</string>
+    <string name="menu_barcode_label">Scan Barcode</string>
+    <string name="tv_add_name">Item name:</string>
+    <string name="tv_add_expire">Expiration:</string>
+    <string name="tv_add_number">Quantity:</string>
+
+
 </resources>
