@@ -28,7 +28,7 @@ public class AddIngredientFragment extends Fragment{
     public static final int REQUEST_CODE_NEW = 0;
     public static final int REQUEST_CODE_EXISTING = 1;
     public static final String KEY_REQUESTCODE = "REQUESTCODE";
-    public static final String KEY_ID = "ITEMID";
+    public static final String KEY_ID = "IDOFITEM";
     public static final String KEY_NAME = "ITEMNAME";
     public static final String KEY_DATE = "ITEMEXPIRATIONDATE";
     public static final String KEY_QUANTITY = "ITEMQUANTITY";
@@ -41,7 +41,7 @@ public class AddIngredientFragment extends Fragment{
     @InjectView(R.id.et_add_name) EditText mETName;
     @InjectView(R.id.et_add_unit) EditText mETUnit;
     private BarcodeScanner scanner;
-    private int mCurrentID;
+    private long mCurrentID;
     private int mCurrentIndex;
 
     @Override
@@ -59,14 +59,13 @@ public class AddIngredientFragment extends Fragment{
 
 
         Intent intent = getActivity().getIntent();
+        
         // If an item was passed to this fragment, fill in pickers with passed data
-
-        // TODO fill in pickers with data
         if(intent.getExtras().getInt(KEY_REQUESTCODE) == REQUEST_CODE_EXISTING){
-            mCurrentID = intent.getIntExtra(KEY_ID, 1);
-            mCurrentIndex = intent.getIntExtra(KEY_INDEX, 1);
+            mCurrentID = intent.getLongExtra(KEY_ID, 0);
+            mCurrentIndex = intent.getIntExtra(KEY_INDEX, 0);
 
-            Log.d("IDProblem", "AddIngredient: " + mCurrentID);
+            Log.d("IDProblem", "AddIngredient id: " + mCurrentID + " " + ", index: " + mCurrentIndex);
 
             Log.d("fill pickers", intent.getStringExtra(KEY_NAME));
             mETName.setText(intent.getStringExtra(KEY_NAME));

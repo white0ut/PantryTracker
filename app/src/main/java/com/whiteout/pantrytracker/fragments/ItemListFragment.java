@@ -70,8 +70,6 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
 
         mListView = (ListView) view.findViewById(R.id.listView);
 
-
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             registerForContextMenu(mListView);
         } else {
@@ -140,7 +138,6 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
                             Item editItem = (Item) mListView.getItemAtPosition(i);
                             Intent intent = itemToIntent(editItem);
                             intent.putExtra(AddIngredientFragment.KEY_INDEX, i);
-                            intent.putExtra(AddIngredientFragment.KEY_ID, editItem.getId());
                             Log.d("IDProblem", "ItemListFrag: " + editItem.getId());
 
                             intent.putExtra(AddIngredientFragment.KEY_REQUESTCODE, AddIngredientFragment.REQUEST_CODE_EXISTING);
@@ -180,6 +177,7 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
             intent.putExtra(AddIngredientFragment.KEY_DATE, item.getExpiration());
             intent.putExtra(AddIngredientFragment.KEY_UNIT, item.getUnit());
             intent.putExtra(AddIngredientFragment.KEY_ID, item.getId());
+            Log.d("IDProblem", "itemToIntent: " + item.getId());
             return intent;
         }
 
@@ -239,14 +237,14 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
             item.setQuantity(data.getFloatExtra(AddIngredientFragment.KEY_QUANTITY, 0));
             item.setUnit(data.getStringExtra(AddIngredientFragment.KEY_UNIT));
 
-
+            // EDIT
             if(requestCode == AddIngredientFragment.REQUEST_CODE_EXISTING){
                 Log.d("ItemListFragment","edit running");
 
                 //TODO update record in database
                 try {
-                    item.setId(data.getLongExtra(AddIngredientFragment.KEY_ID,5));
                     item.setId(data.getLongExtra(AddIngredientFragment.KEY_ID,1));
+                    Log.d("IDProblem", "onActivityResult id: " + item.getId());
                     mAdapter.edit(data.getIntExtra(AddIngredientFragment.KEY_INDEX, 0), item);
                     dataSource.open();
                     dataSource.editItem(item);
@@ -256,6 +254,7 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
                     e.printStackTrace();
                 }
             }
+            // NEW
             else{
                 try {
                     mAdapter.add(item);

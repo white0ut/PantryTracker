@@ -3,7 +3,6 @@ package com.whiteout.pantrytracker.fragments;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.Menu;
@@ -13,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.android.gms.internal.ca;
 import com.whiteout.pantrytracker.R;
 import com.whiteout.pantrytracker.activities.MainActivity;
 import com.whiteout.pantrytracker.activities.RecipeActivity;
@@ -46,7 +46,7 @@ public class RecipeSearchFragment extends ListFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         dataSource = ((MainActivity)getActivity()).getDataSource();
@@ -116,14 +116,22 @@ public class RecipeSearchFragment extends ListFragment {
         @Override
         protected void onPostExecute(List<RecipeSearch> recipeSearches) {
             searches = recipeSearches;
-            List<String> vals = new ArrayList<String>();
-            for (RecipeSearch r : recipeSearches) {
-                vals.add(r.getRecipeName());
+            try {
+                List<String> vals = new ArrayList<String>();
+                for (RecipeSearch r : recipeSearches) {
+                    vals.add(r.getRecipeName());
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                        android.R.layout.simple_list_item_1, vals);
+                setListAdapter(adapter);
+            } catch (NullPointerException e){
+                e.printStackTrace();
             }
+
             Log.d("Kenny", "Setting view");
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                    android.R.layout.simple_list_item_1, vals);
-            setListAdapter(adapter);
+
+
         }
     }
 }
