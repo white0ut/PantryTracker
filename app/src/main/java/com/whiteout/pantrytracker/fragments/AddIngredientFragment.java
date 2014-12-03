@@ -59,7 +59,7 @@ public class AddIngredientFragment extends Fragment{
 
 
         Intent intent = getActivity().getIntent();
-        
+
         // If an item was passed to this fragment, fill in pickers with passed data
         if(intent.getExtras().getInt(KEY_REQUESTCODE) == REQUEST_CODE_EXISTING){
             mCurrentID = intent.getLongExtra(KEY_ID, 0);
@@ -137,13 +137,15 @@ public class AddIngredientFragment extends Fragment{
         }
         else{
             Toast.makeText(getActivity(),
-                    "Invalid data. Please enter a name for the ingredient.",
+                    "Invalid input. Please ensure that all fields are filled in.",
                     Toast.LENGTH_LONG).show();
         }
     }
 
     private boolean inputDataIsValid(){
-        if(mETName.getText().toString().matches("")){
+        if(mETName.getText().toString().matches("")) {
+            return false;
+        }else if (mETQuantity.getText().toString().matches("")){
             return false;
         }else{
             return true;

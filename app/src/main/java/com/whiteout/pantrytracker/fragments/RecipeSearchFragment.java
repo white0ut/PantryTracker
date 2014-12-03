@@ -116,22 +116,16 @@ public class RecipeSearchFragment extends ListFragment {
         @Override
         protected void onPostExecute(List<RecipeSearch> recipeSearches) {
             searches = recipeSearches;
-            try {
-                List<String> vals = new ArrayList<String>();
-                for (RecipeSearch r : recipeSearches) {
-                    vals.add(r.getRecipeName());
-                }
-
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                        android.R.layout.simple_list_item_1, vals);
-                setListAdapter(adapter);
-            } catch (NullPointerException e){
-                e.printStackTrace();
+            List<String> vals = new ArrayList<String>();
+            for (RecipeSearch r : recipeSearches) {
+                vals.add(r.getRecipeName());
             }
 
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, vals);
+            setListAdapter(adapter);
+
             Log.d("Kenny", "Setting view");
-
-
         }
     }
 }
