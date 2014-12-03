@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:descendantFocusability="blocksDescendants"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apple"
+        android:id="@+id/item_name"
+        android:layout_marginLeft="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:textColor="@color/wallet_dim_foreground_inverse_holo_dark" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:id="@+id/item_quantity"
+        android:maxEms="4"
+        android:ems="3"
+        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="oz"
+        android:id="@+id/item_unit"
+        android:layout_alignBottom="@id/item_quantity"
+        android:layout_alignRight="@+id/item_quantity"
+        android:layout_alignEnd="@+id/item_quantity"
+        android:layout_marginRight="-20dp"
+        android:layout_marginEnd="-20dp"/>
+
+    <Button
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/item_list_increment"
+        android:id="@+id/increment_button"
+        android:layout_below="@+id/item_quantity"
+        android:layout_alignLeft="@+id/item_quantity"
+        android:minHeight="10dp"
+        android:minWidth="10dp"
+        android:textColor="#ff37ff1f"/>
+
+    <Button
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/item_list_decrement"
+        android:id="@+id/decrement_button"
+        android:layout_below="@+id/item_quantity"
+        android:minHeight="10dp"
+        android:minWidth="10dp"
+        android:textColor="#ffff3230"
+        android:layout_toRightOf="@+id/increment_button"
+        android:layout_toEndOf="@+id/increment_button"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+        android:text="January 1, 2015"
+        android:id="@+id/item_expiration"
+        android:textColor="@android:color/secondary_text_light"
+        android:layout_alignBottom="@+id/increment_button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="12sp" />
+
+</RelativeLayout>

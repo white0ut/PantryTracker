@@ -12,6 +12,7 @@ import com.whiteout.pantrytracker.fragments.ItemListFragment;
  * Email:   kdecline@gmail.com
  */
 public class PantryPagerAdapter extends FragmentPagerAdapter {
+    private static final int PAGE_COUNT = 2;
 
     FragmentManager fm;
 
@@ -22,16 +23,28 @@ public class PantryPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return "Test";
+        switch(position) {
+            case 0:
+                return "My Items";
+            case 1:
+            default:
+                return "Discover";
+        }
     }
 
     @Override
     public Fragment getItem(int position) {
-        return new ItemListFragment();
+        switch (position) {
+            case 0:
+                return new ItemListFragment();
+            case 1:
+            default:
+                return new ItemListFragment();
+        }
     }
 
     @Override
     public int getCount() {
-        return 2;
+        return PAGE_COUNT;
     }
 }
