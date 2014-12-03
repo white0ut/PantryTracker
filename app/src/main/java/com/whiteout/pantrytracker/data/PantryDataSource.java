@@ -57,9 +57,15 @@ public class PantryDataSource {
 
     public void deleteItem(Item item) {
         long id = item.getId();
-        Log.d(TAG, "delete comment = " + id);
+        Log.d(TAG, "delete item = " + id);
         database.delete(PantrySQLiteHelper.TABLE_ITEM, PantrySQLiteHelper.KEY_ID
         + " = " + id, null);
+    }
+
+    public void deleteItem(Float id) {
+        Log.d(TAG, "delete item = " + id);
+        database.delete(PantrySQLiteHelper.TABLE_ITEM, PantrySQLiteHelper.KEY_ID
+                + " = " + id, null);
     }
 
     public void deleteAllItems() {
@@ -92,6 +98,7 @@ public class PantryDataSource {
 
     public List<Item> getAllItems() {
         List<Item> items = new ArrayList<Item>();
+        Log.d(TAG, "Fetching Items");
 
         Cursor cursor = database.query(PantrySQLiteHelper.TABLE_ITEM,
                 allItemColumns, null, null,null,null, null);
@@ -101,6 +108,7 @@ public class PantryDataSource {
             Item item = cursorToItem(cursor);
             Log.d(TAG, "get item = " + cursorToItem(cursor).toString());
             items.add(item);
+            cursor.moveToNext();
         }
         // close that cursor
         cursor.close();

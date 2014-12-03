@@ -1,9 +1,12 @@
 package com.whiteout.pantrytracker.fragments;
 
+import android.database.sqlite.SQLiteException;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -23,6 +26,7 @@ import com.whiteout.pantrytracker.data.model.Item;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.whiteout.pantrytracker.activities.AddIngredientActivity;
 import com.whiteout.pantrytracker.barcode.*;
@@ -72,18 +76,8 @@ public class ItemListFragment extends Fragment {
             mListView.setMultiChoiceModeListener(actionModeListener);
         }
 
-        // TODO: wire up to DB
-        ArrayList<Item> temp = new ArrayList<Item>();
-        Item one = new Item(1l,"Apples",134523l,4f,"oz");
-        Item two = new Item(1l,"Apples",134523l,4f,"oz");
-        Item thr = new Item(1l,"Apples",134523l,4f,"oz");
-        Item fou = new Item(1l,"Apples",134523l,4f,"oz");
-        temp.add(one);
-        temp.add(two);
-        temp.add(thr);
-        temp.add(fou);
-
-        mAdapter = new ItemListAdapter(getActivity(), R.layout.item_item, temp);
+        mAdapter = new ItemListAdapter(getActivity(), R.layout.item_item, new ArrayList<Item>());
+        new FetchItemsTask().execute();
         mListView.setAdapter(mAdapter);
 
 
@@ -120,22 +114,31 @@ public class ItemListFragment extends Fragment {
                 case R.id.action_delete:
                     for (int i = adapter.getCount() - 1; i >= 0; i--) {
                         if (mListView.isItemChecked(i)) {
-                            // Do logic on item
+                            // Remove element from list
+                            // Asynchronously delete from Database
+                            adapter.deletePosition(i);
+                            new DeleteItemTask().execute(Float.valueOf(String.valueOf(i)));
+                            break;
                         }
                     }
-                    // TODO
                     mode.finish();
                     return true;
                 case R.id.action_edit:
-                    // TODO
+                    // TODO JOSH
                     mode.finish();
                     return true;
                 case R.id.action_refresh:
-                    // TODO
+                    // Asynchronously re-load Items and return
+                    Log.d("Kenny", "Refreshing...");
+                    new FetchItemsTask().execute();
                     mode.finish();
                     return true;
                 case R.id.action_delete_all:
-                    // TODO
+                    // TODO make warning
+                    // Update UI then asynchronously wipe the database
+                    adapter.clear();
+                    adapter.notifyDataSetChanged();
+                    new DeleteAllItemsTask().execute();
                     mode.finish();
                     return true;
                 default:
@@ -166,6 +169,20 @@ public class ItemListFragment extends Fragment {
                     NavUtils.navigateUpFromSameTask(getActivity());
                 }
                 return true;
+            case R.id.action_new:
+                return true;
+            case R.id.action_refresh:
+                // Asynchronously re-load Items and return
+                Log.d("Kenny", "Refreshing...");
+                new FetchItemsTask().execute();
+                return true;
+            case R.id.action_delete_all:
+                // TODO make warning
+                Log.d("Kenny", "Deleting all...");
+                mAdapter.clear();
+                mAdapter.notifyDataSetChanged();
+                new DeleteAllItemsTask().execute();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -176,4 +193,69 @@ public class ItemListFragment extends Fragment {
         inflater.inflate(R.menu.item_list_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
+
+    private class FetchItemsTask extends AsyncTask<Void, Void, List<Item>> {
+
+        @Override
+        protected List<Item> doInBackground(Void... params) {
+            List<Item> items = null;
+            try {
+                dataSource.open();
+                items = dataSource.getAllItems();
+
+            } catch (SQLException e) {
+                Toast.makeText(getActivity(), "Error loading your Pantry Items", Toast.LENGTH_LONG).show();
+            } finally {
+                dataSource.close();
+            }
+            return items;
+        }
+
+        @Override
+        protected void onPostExecute(List<Item> items) {
+            super.onPostExecute(items);
+            Log.d("Kenny", "Finished loading " + items.size() + " items");
+            mAdapter.addAll(items);
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private class DeleteItemTask extends AsyncTask<Float, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Float... params) {
+            if (params.length > 0) {
+                try {
+                    dataSource.open();
+                    for (Float param : params) {
+                        dataSource.deleteItem(param);
+                    }
+                } catch (SQLException e) {
+                    Toast.makeText(getActivity(), "Error removing item from DB", Toast.LENGTH_LONG).show();
+                } finally {
+                    dataSource.close();
+                }
+            }
+            return null;
+        }
+    }
+
+    private class DeleteAllItemsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                dataSource.open();
+                Log.d("Kenny", "Delete all items...");
+                dataSource.deleteAllItems();
+
+            } catch (SQLException e) {
+                Toast.makeText(getActivity(), "Error opening database", Toast.LENGTH_LONG).show();
+            } finally {
+                dataSource.close();
+            }
+            return null;
+        }
+    }
+
 }

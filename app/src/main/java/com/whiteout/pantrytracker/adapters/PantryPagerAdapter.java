@@ -12,7 +12,7 @@ import com.whiteout.pantrytracker.fragments.ItemListFragment;
  * Email:   kdecline@gmail.com
  */
 public class PantryPagerAdapter extends FragmentPagerAdapter {
-    private static final int PAGE_COUNT = 2;
+    private static final int PAGE_COUNT = 1;
 
     FragmentManager fm;
 
