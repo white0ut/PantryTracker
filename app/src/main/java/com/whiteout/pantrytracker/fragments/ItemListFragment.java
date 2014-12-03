@@ -37,7 +37,7 @@ import com.whiteout.pantrytracker.activities.AddIngredientActivity;
  * Date:    10/29/14
  * Email:   kdecline@gmail.com
  */
-public class ItemListFragment extends Fragment {
+public class ItemListFragment extends Fragment implements ItemListAdapter.ItemListAdapterCallbacks {
 
 
     ListView mListView;
@@ -69,6 +69,8 @@ public class ItemListFragment extends Fragment {
 
         mListView = (ListView) view.findViewById(R.id.listView);
 
+
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             registerForContextMenu(mListView);
         } else {
@@ -80,10 +82,16 @@ public class ItemListFragment extends Fragment {
         new FetchItemsTask().execute();
         mListView.setAdapter(mAdapter);
 
+        mAdapter.attachCallbacks(this);
 
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        mAdapter.detachCallbacks();
+        super.onDestroyView();
+    }
 
     AbsListView.MultiChoiceModeListener actionModeListener = new AbsListView.MultiChoiceModeListener() {
         @Override
@@ -125,8 +133,21 @@ public class ItemListFragment extends Fragment {
                     return true;
                 case R.id.action_edit:
                     // TODO JOSH
+                    for (int i = adapter.getCount() - 1; i >= 0; i--) {
+                        if (mListView.isItemChecked(i)) {
+                            // Edit item
+                            Item editItem = (Item) mListView.getItemAtPosition(i);
+                            Intent intent = itemToIntent(editItem);
+                            intent.putExtra(AddIngredientFragment.KEY_INDEX, i);
+                            intent.putExtra(AddIngredientFragment.KEY_ID, editItem.getId());
+                            Log.d("IDProblem", "ItemListFrag: " + editItem.getId());
 
-
+                            intent.putExtra(AddIngredientFragment.KEY_REQUESTCODE, AddIngredientFragment.REQUEST_CODE_EXISTING);
+                            intent.setClass(getActivity(), AddIngredientActivity.class);
+                            startActivityForResult(intent, AddIngredientFragment.REQUEST_CODE_EXISTING);
+                            break;
+                        }
+                    }
                     mode.finish();
                     return true;
                 case R.id.action_refresh:
@@ -146,6 +167,19 @@ public class ItemListFragment extends Fragment {
                 default:
                     return false;
             }
+        }
+
+        /**
+         * Put all elements of Item as extras in an Intent
+         */
+        private Intent itemToIntent(Item item){
+            Intent intent = new Intent();
+            intent.putExtra(AddIngredientFragment.KEY_NAME, item.getName());
+            intent.putExtra(AddIngredientFragment.KEY_QUANTITY, item.getQuantity());
+            intent.putExtra(AddIngredientFragment.KEY_DATE, item.getExpiration());
+            intent.putExtra(AddIngredientFragment.KEY_UNIT, item.getUnit());
+            intent.putExtra(AddIngredientFragment.KEY_ID, item.getId());
+            return intent;
         }
 
         @Override
@@ -172,7 +206,6 @@ public class ItemListFragment extends Fragment {
                 }
                 return true;
             case R.id.action_new:
-                // TODO JOSH
                 Intent intent = new Intent(this.getActivity(), AddIngredientActivity.class);
                 intent.putExtra(AddIngredientFragment.KEY_REQUESTCODE, AddIngredientFragment.REQUEST_CODE_NEW);
                 startActivityForResult(intent, AddIngredientFragment.REQUEST_CODE_NEW);
@@ -204,18 +237,34 @@ public class ItemListFragment extends Fragment {
             item.setExpiration(data.getLongExtra(AddIngredientFragment.KEY_DATE, 0));
             item.setQuantity(data.getFloatExtra(AddIngredientFragment.KEY_QUANTITY, 0));
             item.setUnit(data.getStringExtra(AddIngredientFragment.KEY_UNIT));
+
+
             if(requestCode == AddIngredientFragment.REQUEST_CODE_EXISTING){
-                item.setId(data.getLongExtra(AddIngredientFragment.KEY_ID,0));
+                Log.d("ItemListFragment","edit running");
+
                 //TODO update record in database
-            }
-            else{
                 try {
+                    item.setId(data.getLongExtra(AddIngredientFragment.KEY_ID,5));
+                    item.setId(data.getLongExtra(AddIngredientFragment.KEY_ID,1));
+                    mAdapter.edit(data.getIntExtra(AddIngredientFragment.KEY_INDEX, 0), item);
                     dataSource.open();
-                    dataSource.addItem(item);
+                    dataSource.editItem(item);
+                    dataSource.close();
+                    mAdapter.notifyDataSetChanged();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
+            }
+            else{
+                try {
+                    mAdapter.add(item);
+                    mAdapter.notifyDataSetChanged();
+                    dataSource.open();
+                    dataSource.addItem(item);
+                    dataSource.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             Toast.makeText(getActivity(), item.getName(), Toast.LENGTH_SHORT).show();
         }
@@ -225,6 +274,30 @@ public class ItemListFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.item_list_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onItemQuantityChanged(Item item) {
+        // Asynchronously update the DB
+        new UpdateItemTask().execute(item);
+    }
+
+    private class UpdateItemTask extends AsyncTask<Item, Void, Item> {
+
+        @Override
+        protected Item doInBackground(Item... params) {
+            try {
+                dataSource.open();
+                for (Item param : params) {
+                    dataSource.editItem(param);
+                }
+            } catch (SQLException e) {
+                Toast.makeText(getActivity(), "Error editing values", Toast.LENGTH_SHORT).show();
+            } finally {
+                dataSource.close();
+            }
+            return null;
+        }
     }
 
     private class FetchItemsTask extends AsyncTask<Void, Void, List<Item>> {

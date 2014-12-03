@@ -1,6 +1,7 @@
 package com.whiteout.pantrytracker.activities;
 
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -11,7 +12,11 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.whiteout.pantrytracker.R;
 import com.whiteout.pantrytracker.adapters.PantryPagerAdapter;
 import com.whiteout.pantrytracker.barcode.BarcodeScanner;
+import com.whiteout.pantrytracker.data.model.RecipeSearch;
+import com.whiteout.pantrytracker.data.web.interfaces.YummlyRecipeSearchRetriever;
 import com.whiteout.pantrytracker.fragments.ItemListFragment;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -59,4 +64,14 @@ public class MainActivity extends FragmentActivity {
             handler.removeCallbacks(what);
         }
     };
+
+    // Proof of concept
+    private class RecipeRetrieveTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            YummlyRecipeSearchRetriever ret = new YummlyRecipeSearchRetriever();
+            List<RecipeSearch> response = ret.fetchRecipes(new String[]{"test"});
+            return null;
+        }
+    }
 }

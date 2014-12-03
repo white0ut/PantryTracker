@@ -38,4 +38,6 @@ proguard/
 # Log Files
 *.log
 
+.idea/
+
 PantryTracker.iml
