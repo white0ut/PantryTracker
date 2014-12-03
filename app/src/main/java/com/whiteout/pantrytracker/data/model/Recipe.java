@@ -11,8 +11,11 @@ import java.util.List;
 public class Recipe {
 
     private Long id;
+    private String yummlyId;
     private String name;
     private String directions;
+    private String yield;
+
 
     private List<Item> items;
 
@@ -20,10 +23,14 @@ public class Recipe {
 
     public Recipe(Long id,
                   String name,
-                  String directions) {
+                  String directions,
+                  String yield,
+                  String yummlyId) {
         this.id         = id;
         this.name       = name;
         this.directions = directions;
+        this.yield      = yield;
+        this.yummlyId   = yummlyId;
     }
 
 
@@ -55,5 +62,17 @@ public class Recipe {
     }
     public String getDirections() {
         return this.directions;
+    }
+    public void setYield(String yield) {
+        this.yield = yield;
+    }
+    public String getYield() {
+        return this.yield;
+    }
+    public void setYummlyId(String yummlyId) {
+        this.yummlyId = yummlyId;
+    }
+    public String getYummlyId() {
+        return this.yummlyId;
     }
 }

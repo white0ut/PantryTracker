@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.whiteout.pantrytracker.R;
+import com.whiteout.pantrytracker.activities.MainActivity;
 import com.whiteout.pantrytracker.adapters.ItemListAdapter;
 import com.whiteout.pantrytracker.data.PantryDataSource;
 import com.whiteout.pantrytracker.data.model.Item;
@@ -46,7 +47,7 @@ public class ItemListFragment extends Fragment implements ItemListAdapter.ItemLi
         // Give it an options menu! (they resist sometimes)
         setHasOptionsMenu(true);
         setRetainInstance(true);
-        dataSource = new PantryDataSource(getActivity());
+        dataSource = ((MainActivity)getActivity()).getDataSource();
     }
 
     @Override

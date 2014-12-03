@@ -27,6 +27,8 @@ public class PantrySQLiteHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_RECIPE = "recipe";
     public static final String KEY_RECIPE_NAME = "name";
+    public static final String KEY_YUMMLY_ID = "yummly_id";
+    public static final String KEY_YIELD = "yield";
     public static final String KEY_DIRECTIONS = "directions";
 
 
@@ -51,6 +53,10 @@ public class PantrySQLiteHelper extends SQLiteOpenHelper {
             + KEY_ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_DIRECTIONS
+            + " TEXT, "
+            + KEY_YUMMLY_ID
+            + " TEXT, "
+            + KEY_YIELD
             + " TEXT, "
             + KEY_RECIPE_NAME
             + " TEXT NOT NULL);";

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.whiteout.pantrytracker.data.model.Item;
+import com.whiteout.pantrytracker.data.model.Recipe;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,7 +32,9 @@ public class PantryDataSource {
 
     private String[] allRecipeColumns = {
             PantrySQLiteHelper.KEY_ID,
+            PantrySQLiteHelper.KEY_YUMMLY_ID,
             PantrySQLiteHelper.KEY_DIRECTIONS,
+            PantrySQLiteHelper.KEY_YIELD,
             PantrySQLiteHelper.KEY_RECIPE_NAME
     };
 
@@ -117,6 +120,21 @@ public class PantryDataSource {
         return newItem;
     }
 
+    public Recipe addRecipe(Recipe recipe) {
+        ContentValues values = new ContentValues();
+        values.put(PantrySQLiteHelper.KEY_YUMMLY_ID, recipe.getYummlyId());
+        values.put(PantrySQLiteHelper.KEY_DIRECTIONS, recipe.getDirections());
+        values.put(PantrySQLiteHelper.KEY_YIELD, recipe.getYield());
+        values.put(PantrySQLiteHelper.KEY_RECIPE_NAME, recipe.getName());
+        long insertId = database.insert(PantrySQLiteHelper.TABLE_RECIPE,
+                null, values);
+        if (insertId == -1) {
+            return null;
+        }
+        recipe.setId(insertId);
+        return recipe;
+    }
+
     public List<Item> getAllItems() {
         List<Item> items = new ArrayList<Item>();
         Log.d(TAG, "Fetching Items");
@@ -134,6 +152,32 @@ public class PantryDataSource {
         // close that cursor
         cursor.close();
         return items;
+    }
+
+    public List<Recipe> getAllRecipes() {
+        List<Recipe> recipes = new ArrayList<Recipe>();
+        Log.d(TAG, "Fetching recipes");
+
+        Cursor cursor = database.query(PantrySQLiteHelper.TABLE_RECIPE,
+                allRecipeColumns, null, null, null, null, null);
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()) {
+            Recipe rec = cursorToRecipe(cursor);
+            recipes.add(rec);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return recipes;
+    }
+
+    private Recipe cursorToRecipe(Cursor cursor) {
+        Recipe rec = new Recipe();
+        rec.setId(cursor.getLong(0));
+        rec.setYummlyId(cursor.getString(1));
+        rec.setdirections(cursor.getString(2));
+        rec.setYield(cursor.getString(3));
+        rec.setName(cursor.getString(4));
+        return rec;
     }
 
     private Item cursorToItem(Cursor cursor) {

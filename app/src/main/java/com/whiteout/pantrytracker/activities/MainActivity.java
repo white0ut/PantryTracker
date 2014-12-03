@@ -12,6 +12,7 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.whiteout.pantrytracker.R;
 import com.whiteout.pantrytracker.adapters.PantryPagerAdapter;
 import com.whiteout.pantrytracker.barcode.BarcodeScanner;
+import com.whiteout.pantrytracker.data.PantryDataSource;
 import com.whiteout.pantrytracker.data.model.RecipeSearch;
 import com.whiteout.pantrytracker.data.web.interfaces.YummlyRecipeSearchRetriever;
 import com.whiteout.pantrytracker.fragments.ItemListFragment;
@@ -26,6 +27,8 @@ public class MainActivity extends FragmentActivity {
 
     private final Handler handler = new Handler();
 
+    private PantryDataSource dataSource;
+
     @InjectView(R.id.view_pager) ViewPager pager;
     @InjectView(R.id.tabs) PagerSlidingTabStrip tabs;
 
@@ -39,7 +42,7 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-
+        dataSource = new PantryDataSource(this);
         adapter = new PantryPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(adapter);
 
@@ -48,29 +51,19 @@ public class MainActivity extends FragmentActivity {
 
     }
 
-    private Drawable.Callback drawableCallback = new Drawable.Callback() {
-        @Override
-        public void invalidateDrawable(Drawable who) {
-            getActionBar().setBackgroundDrawable(who);
-        }
-
-        @Override
-        public void scheduleDrawable(Drawable who, Runnable what, long when) {
-            handler.postAtTime(what, when);
-        }
-
-        @Override
-        public void unscheduleDrawable(Drawable who, Runnable what) {
-            handler.removeCallbacks(what);
-        }
-    };
+    public PantryDataSource getDataSource() {
+        return dataSource;
+    }
 
     // Proof of concept
     private class RecipeRetrieveTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
             YummlyRecipeSearchRetriever ret = new YummlyRecipeSearchRetriever();
-            List<RecipeSearch> response = ret.fetchRecipes(new String[]{"test"});
+            List<RecipeSearch> response = ret.fetchRecipes(new String[]{"vegetarian"});
+            for (RecipeSearch s : response) {
+                Log.wtf("Kenny", s.getRecipeName());
+            }
             return null;
         }
     }

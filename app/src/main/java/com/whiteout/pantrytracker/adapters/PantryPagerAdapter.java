@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.whiteout.pantrytracker.fragments.ItemListFragment;
+import com.whiteout.pantrytracker.fragments.RecipeFragment;
 
 /**
  * Author:  Kendrick Cline
@@ -12,7 +13,7 @@ import com.whiteout.pantrytracker.fragments.ItemListFragment;
  * Email:   kdecline@gmail.com
  */
 public class PantryPagerAdapter extends FragmentPagerAdapter {
-    private static final int PAGE_COUNT = 1;
+    private static final int PAGE_COUNT = 2;
 
     FragmentManager fm;
 
@@ -39,7 +40,7 @@ public class PantryPagerAdapter extends FragmentPagerAdapter {
                 return new ItemListFragment();
             case 1:
             default:
-                return new ItemListFragment();
+                return new RecipeFragment();
         }
     }
 
